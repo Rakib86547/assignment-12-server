@@ -69,10 +69,19 @@ async function run() {
             }
             res.status(401).send({accessToken: ''});
         });
+        // save bookings
         app.post('/bookings', async (req, res) => {
             const booking = req.body;
             const result = await bookingsCollection.insertOne(booking);
             res.send(result);
+        });
+
+        // get bookings
+        app.get('/bookings', async (req, res) => {
+            const email = req.query.email;
+            const query = {email: email};
+            const result = await bookingsCollection.find(query).toArray();
+            res.send(result)
         })
 
     }
