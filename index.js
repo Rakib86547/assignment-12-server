@@ -18,6 +18,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 // verify jwt function
 const verifyJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
+    console.log(authHeader)
     if(!authHeader) {
         return res.status(403).send({message: "unauthorized access"});
     }
@@ -35,6 +36,7 @@ async function run() {
         const categoriesCollection = client.db('carMaster').collection('categories');
         const allCategoriesCollection = client.db('carMaster').collection('allCategorie');
         const usersCollection = client.db('carMaster').collection('users');
+        const bookingsCollection = client.db('carMaster').collection('bookings');
 
         app.get('/category', async (req, res) => {
             const query = {}
@@ -45,6 +47,7 @@ async function run() {
         app.get('/all_categories/:id', async (req, res) => {
             const id = req.params.id;
             const query = { category_id: id };
+            // const query = {_id:Object(id)}
             const result = await categoriesCollection.find(query).toArray();
             res.send(result);
         });
@@ -65,6 +68,11 @@ async function run() {
                 return res.send({accessToken: token})
             }
             res.status(401).send({accessToken: ''});
+        });
+        app.post('/bookings', async (req, res) => {
+            const booking = req.body;
+            const result = await bookingsCollection.insertOne(booking);
+            res.send(result);
         })
 
     }
