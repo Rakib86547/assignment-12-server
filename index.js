@@ -37,6 +37,7 @@ async function run() {
         const allCategoriesCollection = client.db('carMaster').collection('allCategorie');
         const usersCollection = client.db('carMaster').collection('users');
         const bookingsCollection = client.db('carMaster').collection('bookings');
+        const seller_BookingsCollection = client.db('carMaster').collection('seller_bookings');
 
         app.get('/category', async (req, res) => {
             const query = {}
@@ -90,6 +91,13 @@ async function run() {
             const query = {email: email};
             const result = await bookingsCollection.find(query).toArray();
             res.send(result)
+        });
+
+        // save seller products
+        app.post('/seller_bookings', async (req, res) => {
+            const bookings = req.body;
+            const result = await seller_BookingsCollection.insertOne(bookings);
+            res.send(result);
         })
 
     }
