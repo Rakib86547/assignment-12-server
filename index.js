@@ -19,13 +19,13 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 const verifyJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
     console.log(authHeader)
-    if(!authHeader) {
-        return res.status(403).send({message: "unauthorized access"});
+    if (!authHeader) {
+        return res.status(403).send({ message: "unauthorized access" });
     }
     const token = authHeader.split(' ')[1];
-    jwt.verify(token, process.env.ACCESS_JWT_TOKEN, function(err, decoded) {
-        if(err) {
-            return res.status(401).send({message: 'unauthorized access'})
+    jwt.verify(token, process.env.ACCESS_JWT_TOKEN, function (err, decoded) {
+        if (err) {
+            return res.status(401).send({ message: 'unauthorized access' })
         }
         req.decoded = decoded;
         next();
@@ -63,20 +63,20 @@ async function run() {
         // get user role 
         app.get('/user/:email', async (req, res) => {
             const email = req.params.email;
-            const query = {email: email};
+            const query = { email: email };
             const result = await usersCollection.findOne(query);
             res.send(result)
         })
 
         app.get('/jwt', async (req, res) => {
             const email = req.query.email;
-            const query = {email:email};
+            const query = { email: email };
             const user = await usersCollection.findOne(query);
-            if(user) {
-                const token = jwt.sign({email}, process.env.ACCESS_JWT_TOKEN, {expiresIn: '1d'});
-                return res.send({accessToken: token})
+            if (user) {
+                const token = jwt.sign({ email }, process.env.ACCESS_JWT_TOKEN, { expiresIn: '1d' });
+                return res.send({ accessToken: token })
             }
-            res.status(401).send({accessToken: ''});
+            res.status(401).send({ accessToken: '' });
         });
         // save bookings
         app.post('/bookings', async (req, res) => {
@@ -88,7 +88,7 @@ async function run() {
         // get bookings
         app.get('/bookings', async (req, res) => {
             const email = req.query.email;
-            const query = {email: email};
+            const query = { email: email };
             const result = await bookingsCollection.find(query).toArray();
             res.send(result)
         });
@@ -97,6 +97,14 @@ async function run() {
         app.post('/seller_bookings', async (req, res) => {
             const bookings = req.body;
             const result = await seller_BookingsCollection.insertOne(bookings);
+            res.send(result);
+        });
+
+        // get seller products
+        app.get('/seller_bookings', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const result = await seller_BookingsCollection.find(query).toArray();
             res.send(result);
         })
 
