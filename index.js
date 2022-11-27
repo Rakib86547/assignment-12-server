@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const app = express();
@@ -106,6 +106,31 @@ async function run() {
             const query = { email: email };
             const result = await seller_BookingsCollection.find(query).toArray();
             res.send(result);
+        });
+
+        app.put('/sellers/:id', async (req, res) => {
+            // const decodedEmail = req.decoded.email;
+            // const query = { email: decodedEmail };
+            // const sellers = await usersCollection.findOne(query);
+            // if(user?.sta)
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    status: 'unsold'
+                }
+            };
+            const result = await seller_BookingsCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+            console.log(result)
+        });
+
+        // get all user
+        app.get('/all_users', verifyJWT, async (req, res) => {
+            const query = { role: "User" };
+            const user = await usersCollection.find(query).toArray();
+            res.send(user)
         })
 
     }
