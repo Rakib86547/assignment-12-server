@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-console.log(process.env.STRIPE_SECRET_KEY)
+
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.tiiizrg.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
@@ -43,13 +43,9 @@ async function run() {
 
         // verify admin 
         const verifyAdmin = async (req, res, next) => {
-
-            console.log(req.decoded.email)
             const decodedEmail = req.decoded.email;
             const query = { email: decodedEmail };
-            console.log(query)
             const user = await usersCollection.findOne(query);
-            console.log(user)
             console.log(user?.role)
             if (user?.role !== decodedEmail) {
                 return res.status(403).send({ message: 'forbidden access' })
@@ -180,11 +176,8 @@ async function run() {
         // api for payment
         app.post('/create_payment_intent', async (req, res) => {
             const booking = req.body;
-
             const price = booking.price;
-
             const amount = price * 100
-
             const paymentIntent = await stripe.paymentIntents.create({
                 currency: "usd",
                 amount: amount,
